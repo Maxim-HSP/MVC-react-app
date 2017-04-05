@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul, li {
+            list-style: none;
+        }
+
+        .smallImgs {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .smallImgs li {
+            margin-right: 10px;
+        }
+
+        .selectd {
+            border: 1px solid red;
+        }
+
+        .showImg {
+            display: flex;
+            flex-direction: row;
+            position: relative;
+        }
+
+        .showImg .leftImg {
+            margin-right: 10px;
+        }
+
+        .inner {
+            width: 231px;
+            height: 231px;
+            background-image: url(./img/21_03.png);
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: .4;
+        }
+
+        .showImg .rightImg {
+            width: 430px;
+            height: 430px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .rightImg img {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+
+
+    </style>
+    <script src="../build/react.min.js" charset="utf-8"></script>
+    <script src="../build/react-dom.min.js" charset="utf-8"></script>
+    <script src="../build/browser.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div id="app"></div>
+    <script type="text/babel">
+
+        // SmallImgs 组件
+        var SmallImgs = React.createClass({
+            render: function() {
+                return (
+                    <ul className="smallImgs">
+                        {
+                            this.props.imgs.map(function(item, index) {
+                                return (
+                                    <li><img className={
+                                        this.props.curImg === item ? "selectd" : ""
+                                    }
+                                    onMouseEnter={function() {
+                                        this.props.setCurImg(item)
+                                    }.bind(this)}
+                                    src={ item } alt=""/></li>
+                                );
+                            }.bind(this))
+                        }
+                    </ul>
+                );
+            }
+        });
+
+        // ShowImg 组件
+        var ShowImg = React.createClass({
+            getInitialState: function() {
+                return {
+                    isShow: false,
+                    innerLeft: 0,
+                    innerTop: 0
+                }
+            },
+            getRightTop: function() {
+                return -this.state.innerTop * 800 / 430;
+            },
+            getRightLeft: function() {
+                return -this.state.innerLeft * 800 / 430
+            },
+            render: function() {
+                return (
+                    <div className="showImg">
+                        <div className="leftImg"
+                            ref="left"
+                            onMouseEnter={function() {
+                                this.setState({
+                                    isShow: true
+                                })
+                            }.bind(this)}
+                            onMouseLeave={function() {
+                                this.setState({
+                                    isShow: false
+                                })
+                            }.bind(this)}
+                            onMouseMove={function(e) {
+                                var ox = e.clientX - this.refs.inner.offsetWidth / 2;
+                                var oy = e.clientY - this.refs.inner.offsetHeight / 2;
+                                if(ox < 0) {
+                                    ox = 0;
+                                }
+
+                                if(ox > this.refs.left.offsetWidth - this.refs.inner.offsetWidth) {
+                                    ox = this.refs.left.offsetWidth - this.refs.inner.offsetWidth;
+                                }
+
+                                if(oy < 0) {
+                                    oy = 0
+                                }
+
+                                if(oy > this.refs.left.offsetHeight - this.refs.inner.offsetHeight) {
+                                    oy = this.refs.left.offsetHeight - this.refs.inner.offsetHeight
+                                }
+
+                                this.setState({
+                                    innerLeft: ox,
+                                    innerTop: oy
+                                })
+                            }.bind(this)}
+                        >
+                            <img src={ this.props.img } alt=""/>
+                            <div ref="inner" style={{
+                                display: this.state.isShow ? "block" : "none",
+                                left: this.state.innerLeft,
+                                top: this.state.innerTop
+                            }} className="inner"></div>
+                        </div>
+                        <div style={{display: this.state.isShow ? "" : "none"}} className="rightImg">
+                            <img style={{
+                                left: this.getRightLeft(),
+                                top: this.getRightTop()
+                            }} src={ this.props.img.replace(2, 3) } alt=""/>
+                        </div>
+                    </div>
+                )
+            }
+        })
+
+        var App = React.createClass({
+            getInitialState: function() {
+                return {
+                    imgs: [
+                        "./img/imgA_1.png",
+                        "./img/imgB_1.png",
+                        "./img/imgC_1.png",
+                        "./img/imgD_1.png"
+                    ],
+                    curImg: "./img/imgA_1.png"
+                }
+            },
+            setCurImg: function(img) {
+                this.setState({
+                    curImg: img
+                })
+            },
+            render: function() {
+                return (
+                    <div>
+                        <ShowImg img={ this.state.curImg.replace(1, 2) } />
+                        <SmallImgs
+                        setCurImg={ this.setCurImg }
+                        { ...this.state } />
+                    </div>
+                );
+            }
+        });
+
+        ReactDOM.render(<App />, app)
+    </script>
+</body>
+</html>

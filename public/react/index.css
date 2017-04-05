@@ -1,0 +1,25 @@
+.wrap{
+/*    max-width: 500px;*/
+    border: 1px solid skyblue;
+    padding: 5px;
+}
+
+.done {
+	text-decoration: line-through;
+}
+
+.infoUl,.emp{
+    display: flex;
+    list-style: none;
+}
+.emp-nav{
+    margin-right: 20px;
+}
+
+.infoUl li {
+    padding-right: 10px;
+}
+
+.empList tr,.empList td{
+    border: 1px solid;
+}
